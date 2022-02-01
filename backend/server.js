@@ -1,9 +1,9 @@
 import express from "express";
 import dotenv from "dotenv";
 import path from "path";
-import colors from "colors";
+// import colors from "colors";
 import connectDB from "./config/db.js";
-import mongoose from "mongoose";
+// import mongoose from "mongoose";
 import productRouter from "./routers/productRouter.js";
 import userRouter from "./routers/userRouter.js";
 import orderRouter from "./routers/orderRouter.js";
