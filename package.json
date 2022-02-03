@@ -5,8 +5,8 @@
   "description": "ecommerce demo site like amazon",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --watch backend --exec node --experimental-modules backend/server.js",
-    "heroku-postbuild": "cd frontend && npm install && npm run build"
+    "build": "cd frontend && yarn install && yarn run build",
+    "start": "nodemon --watch backend --exec node --experimental-modules backend/server.js"
   },
   "repository": {
     "type": "git"
