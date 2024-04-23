@@ -1,59 +1,63 @@
+import path from "path";
 import express from "express";
 import dotenv from "dotenv";
-import path from "path";
-// import colors from "colors";
-import connectDB from "./config/db.js";
-// import mongoose from "mongoose";
-import productRouter from "./routers/productRouter.js";
-import userRouter from "./routers/userRouter.js";
-import orderRouter from "./routers/orderRouter.js";
-import uploadRouter from "./routers/uploadRouter.js";
-
+import cookieParser from 'cookie-parser';
 dotenv.config();
+import connectDB from "./config/db.js";
+import productRoutes from "./routes/productRoutes.js";
+import categoryRoutes from "./routes/categoryRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
+import uploadRoutes from "./routes/uploadRoutes.js";
+import { notFound, errorHandler } from './middleware/errorMiddleware.js'
+import cors from 'cors'
 
-const app = express();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+const port = process.env.PORT || 4000;
 
 connectDB();
 
-// mongoose.connect("mongodb://localhost:27017/bobazon", {
-// useNewUrlParser: true,
-// useUnifiedTopology: true,
-// });
+const app = express();
 
-// app.get("/api/users", (req, res) => {
-//   res.send(data.users);
-// });
+app.use(cors());
 
-app.use("/api/uploads", uploadRouter);
-app.use("/api/users", userRouter);
-app.use("/api/products", productRouter);
-app.use("/api/orders", orderRouter);
-app.get("/api/config/paypal", (req, res) => {
-  res.send(process.env.PAYPAL_CLIENT_ID);
-});
 
-const __dirname = path.resolve();
-app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
+app.use(express.json());
 
-  app.use(express.static(path.join(__dirname, '/frontend/build')));
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
-  app.get('*', (req, res) => 
-    res.sendFile(path.join(__dirname, '/frontend/build/index.html'))
+
+app.use("/api/users", userRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/upload", uploadRoutes);
+
+app.get('/api/config/paypal', (req, res) =>
+  res.send({ clientId: process.env.PAYPAL_CLIENT_ID })
 );
 
-  // app.get("/", (req, res) => {
-  //   res.send("Server is Running")
-  // });
 
-app.use((err, req, res, next) => {
-  res.status(500).send({ message: err.message });
+const __dirname = path.resolve();
+
+// pay attention to this.  This route places image in root file.
+// See also Multer and the upload routes file.
+app.use("/uploads", express.static(path.join(__dirname, '/uploads'))
+
+)
+
+app.get("/", (req, res) => {
+  res.send("Server is Running")
 });
 
-const port = process.env.PORT || 5000;
+app.use(notFound);
+app.use(errorHandler);
 
-app.listen(port, () => {
-  console.log(`Serve at http://localhost:${port}`);
-});
+// app.use((err, req, res, next) => {
+//   res.status(500).send({ message: err.message });
+// });
+
+app.listen(port, () => 
+   console.log(`Server running in ${process.env.NODE_ENV} mode on port ${port}`))
+

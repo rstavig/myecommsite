@@ -1,0 +1,43 @@
+import {v2 as cloudinary} from 'cloudinary';
+import dotenv from 'dotenv'
+
+dotenv.config()
+// const cloudinary = cloudinaryModule.v2
+
+cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.CLOUD_API_KEY,
+    api_secret: process.env.CLOUD_API_SECRET,
+})
+
+export const upload_file = (file, folder) => {
+    return new Promise((resolve, reject) => {
+        cloudinary.uploader.upload(
+            file,
+            (result) => {
+                resolve({
+                    public_id: result.public_id,
+                    url: result.url,
+                });
+            },
+            {
+                resource_type: "auto",
+                folder,
+            }
+        );
+    });
+};
+
+export const delete_file = async (file) => {
+    const res = await cloudinary.uploader.destroy(file);
+
+    if (res.result === "ok") return true;
+};
+
+
+
+export default cloudinary
+
+
+
+
